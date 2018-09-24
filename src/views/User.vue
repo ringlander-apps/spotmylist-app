@@ -1,22 +1,20 @@
 <template>
   <div>
-    <h1>This is the User View</h1>
-    <UserProfile msg="Enter the user profile component"/>
+    <UserProfile/>
   </div>
 </template>
 
 <script>
-  import UserProfile from "@/components/UserProfile.vue";
+import UserProfile from "@/components/UserProfile.vue";
 
-  export default {
-    name: "user",
+export default {
+  name: "user",
 
-    components:{
-      UserProfile
-    }
+  components: {
+    UserProfile
   }
+};
 </script>
 
 <style scoped>
-
 </style>
