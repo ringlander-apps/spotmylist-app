@@ -8,6 +8,10 @@ class FirebaseService {
     };
     db.settings(settings);
   }
+  /**
+   * 
+   * @param {*} playlistId 
+   */
   async getTracksForPlaylist(playlistId) {
     let tracks = [];
 
@@ -33,6 +37,10 @@ class FirebaseService {
     });
     return tracks;
   }
+  /**
+   * 
+   * @param {*} userId 
+   */
   async getPlaylistsByUser(userId) {
     let pls = [];
     const queryResponse = await db
@@ -56,7 +64,7 @@ class FirebaseService {
       };
       pls.push(plObj);
     });
-    pls.forEach(async pl => {
+    /* pls.forEach(async pl => {
       const trackQueryResponse = await db
         .collection(`playlists/${pl.id}/tracks`)
         .get();
@@ -76,7 +84,7 @@ class FirebaseService {
         };
         pl.tracks.push(trackObj);
       });
-    });
+    }); */
     return pls;
   }
   /**

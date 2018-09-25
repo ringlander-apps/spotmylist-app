@@ -7,13 +7,11 @@
 
 <script>
 // @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
 import ShowCase from "@/components/Showcase.vue";
 
 export default {
   name: "home",
   components: {
-    //HelloWorld,
     ShowCase
   }
 };
