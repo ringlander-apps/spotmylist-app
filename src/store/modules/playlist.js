@@ -4,6 +4,7 @@ import {
   GET_SPOTIFY_PLAYLISTS_REQUEST,
   GET_FIRESTORE_PLAYLISTS_REQUEST,
   GET_SPOTIFY_PLAYLISTS_TRACKS_REQUEST,
+  GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST,
   SELECT_FIRESTORE_PLAYLIST_REQUEST,
   SELECT_SPOTIFY_PLAYLIST_REQUEST,
   CHECK_SYNC_NEEDED_REQUEST
@@ -14,7 +15,8 @@ const state = {
   spotifyPlaylists: null,
   firestorePlaylists: null,
   selectedSpotifyPlaylist: null,
-  selectedFirestorePlaylist: null
+  selectedFirestorePlaylist: null,
+  playlistStatus: null
 };
 const getters = {
   SPOTIFY_PLAYLISTS: state => {
@@ -28,6 +30,9 @@ const getters = {
   },
   SELECTED_FIRESTORE_PLAYLIST: state => {
     return state.selectedFirestorePlaylist;
+  },
+  PLAYLIST_STATUS: state => {
+    return state.playlistStatus;
   }
 };
 const mutations = {
@@ -42,6 +47,9 @@ const mutations = {
   },
   SET_SELECTED_FIRESTORE_PLAYLIST: (state, payload) => {
     state.selectedFirestorePlaylist = payload;
+  },
+  SET_PLAYLIST_STATUS: (state, payload) => {
+    state.playlistStatus = payload;
   }
 };
 const actions = {
@@ -73,20 +81,26 @@ const actions = {
           );
         } */
       });
-      state.firestorePlaylists.forEach(pl => {
-        console.log(pl.tracks[0]);
-      });
     }
   },
+  /**
+   *
+   */
   [GET_FIRESTORE_PLAYLISTS_REQUEST]: ({ commit, dispatch }, userId) => {
     return new Promise((resolve, reject) => {
+      commit("SET_PLAYLIST_STATUS", "Loading playlists from FIREBASE");
       firebaseService
         .getPlaylistsByUser(userId)
         .then(resp => {
+          commit("SET_PLAYLIST_STATUS", "Playlists from FIREBASE loaded");
           commit("SET_FIRESTORE_PLAYLISTS", resp);
-          dispatch("CHECK_SYNC_NEEDED_REQUEST");
+          dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST").then(resp => {
+            console.log("Response from action" + resp);
+          });
+          //dispatch("CHECK_SYNC_NEEDED_REQUEST");
           resolve("OK");
         })
+
         .catch(err => console.log(err));
     });
   },
@@ -94,12 +108,17 @@ const actions = {
     let pl = state.firestorePlaylists.find(p => p.spotifyId === playlistId);
     commit("SET_SELECTED_FIRESTORE_PLAYLIST", pl);
   },
+  /**
+   *
+   */
   [GET_SPOTIFY_PLAYLISTS_REQUEST]: ({ commit, dispatch }, payload) => {
     return new Promise((resolve, reject) => {
+      commit("SET_PLAYLIST_STATUS", "Loading playlists from SPOTIFY");
       spotifyService
         .getPlaylists(payload.id, payload.token)
         .then(resp => {
           //console.log(resp[0].image);
+          commit("SET_PLAYLIST_STATUS", "Playlists from SPOTIFY loaded");
           commit("SET_SPOTIFY_PLAYLISTS", resp);
           dispatch("GET_SPOTIFY_PLAYLISTS_TRACKS_REQUEST", payload).then(
             result => {
@@ -118,12 +137,35 @@ const actions = {
         });
     });
   },
+  /**
+   *
+   */
   [SELECT_SPOTIFY_PLAYLIST_REQUEST]: ({ commit }, playlistId) => {
-    //console.log(playlistId);
-    //console.log(state.spotifyPlaylists);
     let pl = state.spotifyPlaylists.find(pl => pl.spotifyId === playlistId);
     commit("SET_SELECTED_SPOTIFY_PLAYLIST", pl);
   },
+  /**
+   *
+   */
+  [GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST]: ({ commit, dispatch }) => {
+    return new Promise((resolve, reject) => {
+      commit("SET_PLAYLIST_STATUS", "Loading tracks for playlists");
+      let tracks = [];
+      state.firestorePlaylists.forEach(pl => {
+        firebaseService
+          .getTracksForPlaylist(pl.id)
+          .then(res => {
+            tracks = res;
+            console.log("Tracks returned: " + res);
+            resolve("Firebase tracks returned OK");
+          })
+          .catch(err => reject(err));
+      });
+    });
+  },
+  /**
+   *
+   */
   [GET_SPOTIFY_PLAYLISTS_TRACKS_REQUEST]: ({ commit, dispatch }, payload) => {
     return new Promise((resolve, reject) => {
       let tempTracks;
