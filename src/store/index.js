@@ -1,32 +1,18 @@
-import Vue from 'vue';
-import Vuex from 'vuex';
-import { stat } from "fs";
-import { isContext } from "vm";
-import Axios from "axios";
-import spotifyConfig from "../spotifyConfig";
+import Vue from "vue";
+import Vuex from "vuex";
 
 import session from "./modules/session";
-import spotifyStore from "./modules/spotifyStore";
-import firebaseStore from "./modules/firebaseStore";
 import user from "./modules/user";
+import playlist from "./modules/playlist";
 
-Vue.use(Vuex)
+Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {
-    spotifyAccessToken: '',
-    spotifyUserUrl: '',
-    spotifyHeaders: null,
-    spotifyUser: null,
-    currentUser: null,
-    loggedInToSpotify: false,
-    spotifyPlaylists: null
-  },
+  state: {},
 
-  modules:{
+  modules: {
     session,
-    spotifyStore,
-    firebaseStore,
-    user
+    user,
+    playlist
   }
 });
