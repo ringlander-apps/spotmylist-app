@@ -1,14 +1,15 @@
 import Vue from "vue";
 import Router from "vue-router";
 import Home from "./views/Home.vue";
-import Explorer from  "./views/Explorer.vue";
+import Explorer from "./views/Explorer.vue";
 import Auth from "./views/Auth.vue";
 import User from "./views/User.vue";
+import SpotifyAuth from "./views/SpotifyAuth.vue";
 
 Vue.use(Router);
 
 export default new Router({
-  mode:'history',
+  mode: "history",
   routes: [
     {
       path: "/",
@@ -26,10 +27,16 @@ export default new Router({
       component: Auth
     },
     {
+      path: "/spotify-auth",
+      name: "spotifyAuth",
+      component: SpotifyAuth
+    },
+    {
       path: "/user",
       name: "user",
-      component:User
+      component: User
     },
+
     {
       path: "/about",
       name: "about",
