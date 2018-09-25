@@ -94,10 +94,12 @@ const actions = {
         .then(resp => {
           commit("SET_PLAYLIST_STATUS", "Playlists from FIREBASE loaded");
           commit("SET_FIRESTORE_PLAYLISTS", resp);
-          dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST").then(resp => {
-            console.log("Response from action " + resp.status);
+          dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST").
+            then(result => {
+              if(result.status===100){
+
+              }
           });
-          //dispatch("CHECK_SYNC_NEEDED_REQUEST");
           resolve("OK");
         })
 
@@ -147,7 +149,6 @@ const actions = {
       spotifyService
         .getPlaylists(payload.id, payload.token)
         .then(resp => {
-          //console.log(resp[0].image);
           commit("SET_PLAYLIST_STATUS", "Playlists from SPOTIFY loaded");
           commit("SET_SPOTIFY_PLAYLISTS", resp);
           dispatch("GET_SPOTIFY_PLAYLISTS_TRACKS_REQUEST", payload).then(
