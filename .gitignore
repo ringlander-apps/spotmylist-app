@@ -1,6 +1,8 @@
 .DS_Store
 node_modules
 /dist
+public/img/spotify-icons-logos
+public/img/spotify-icons-logos.zip
 
 # local env files
 .env.local

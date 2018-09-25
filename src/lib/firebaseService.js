@@ -9,8 +9,8 @@ class FirebaseService {
     db.settings(settings);
   }
   /**
-   * 
-   * @param {*} playlistId 
+   *
+   * @param {*} playlistId
    */
   async getTracksForPlaylist(playlistId) {
     let tracks = [];
@@ -20,7 +20,6 @@ class FirebaseService {
       .get();
 
     trackQueryResponse.docs.forEach(doc => {
-      console.log(doc.data());
       let trackObj = {
         id: doc.id,
         spotifyTrackID: doc.data().spotifyTrackId,
@@ -35,11 +34,12 @@ class FirebaseService {
       };
       tracks.push(trackObj);
     });
+    console.log(tracks);
     return tracks;
   }
   /**
-   * 
-   * @param {*} userId 
+   *
+   * @param {*} userId
    */
   async getPlaylistsByUser(userId) {
     let pls = [];

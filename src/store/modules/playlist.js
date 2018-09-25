@@ -95,7 +95,7 @@ const actions = {
           commit("SET_PLAYLIST_STATUS", "Playlists from FIREBASE loaded");
           commit("SET_FIRESTORE_PLAYLISTS", resp);
           dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST").then(resp => {
-            console.log("Response from action" + resp);
+            console.log("Response from action " + resp.status);
           });
           //dispatch("CHECK_SYNC_NEEDED_REQUEST");
           resolve("OK");
@@ -107,6 +107,36 @@ const actions = {
   [SELECT_FIRESTORE_PLAYLIST_REQUEST]: ({ commit }, playlistId) => {
     let pl = state.firestorePlaylists.find(p => p.spotifyId === playlistId);
     commit("SET_SELECTED_FIRESTORE_PLAYLIST", pl);
+  },
+  [GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST]: ({ commit, dispatch }) => {
+    return new Promise((resolve, reject) => {
+      commit(
+        "SET_PLAYLIST_STATUS",
+        "Loading tracks for all Firestore playlists"
+      );
+      let tracks = [];
+      state.firestorePlaylists.forEach(pl => {
+        firebaseService
+          .getTracksForPlaylist(pl.id)
+          .then(res => {
+            tracks = res;
+            commit(
+              "SET_PLAYLIST_STATUS",
+              "Adding tracks for Firestore playlist" + pl.name
+            );
+            pl.tracks = tracks;
+          })
+          .catch(err => reject(err));
+      });
+      commit(
+        "SET_PLAYLIST_STATUS",
+        "Loading of Firestore tracks for all playlists completed"
+      );
+      resolve({
+        status: 100,
+        message: "Tracks loaded for all Firestore playlists"
+      });
+    });
   },
   /**
    *
@@ -147,22 +177,6 @@ const actions = {
   /**
    *
    */
-  [GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST]: ({ commit, dispatch }) => {
-    return new Promise((resolve, reject) => {
-      commit("SET_PLAYLIST_STATUS", "Loading tracks for playlists");
-      let tracks = [];
-      state.firestorePlaylists.forEach(pl => {
-        firebaseService
-          .getTracksForPlaylist(pl.id)
-          .then(res => {
-            tracks = res;
-            console.log("Tracks returned: " + res);
-            resolve("Firebase tracks returned OK");
-          })
-          .catch(err => reject(err));
-      });
-    });
-  },
   /**
    *
    */

@@ -45,13 +45,26 @@
         </md-button>
         <md-button v-if="AUTHENTICATED" class="md-icon-button" to="/user">
             <md-icon v-if="!AUTH_USER">person</md-icon>
-            <md-avatar v-if="AUTH_USER">
-              <img :src=AUTH_USER.picture alt="" srcset="">
+            <md-avatar v-if="AUTH_USER && USER_PROFILE">
+              <img :src=USER_PROFILE.userImage.url alt="" srcset="">
             </md-avatar>
         </md-button>
         <div>
-          <span v-if="AUTH_USER && USER_PROFILE">Hi, {{USER_PROFILE.userName}}</span>
+          <span v-if="AUTH_USER && USER_PROFILE">Hi, {{USER_PROFILE.fullName}}</span>
         </div>
+        <div v-if="AUTH_USER && USER_PROFILE && USER_PROFILE.spotifySettings.connectedToSpotify">
+          <span v-if="!AUTHENTICATED_WITH_SPOTIFY">
+
+          </span>
+          <span v-else>
+            <md-button class="md-icon-button" @click="LOGOUT_FROM_SPOTIFY()">
+              <md-icon><img src="../assets/Spotify_Icon_RGB_Green.png" alt="Signed in to Spotify"></md-icon>
+            </md-button>
+            
+          </span>
+        </div>
+        <a v-if="AUTH_USER && USER_PROFILE && USER_PROFILE.spotifySettings.connectedToSpotify && !AUTHENTICATED_WITH_SPOTIFY" 
+          href="https://wt-528cf0f2960f63b4d651b3859d2fbb9a-0.sandbox.auth0-extend.com/spotify_auth/login" class="button">Sign-in to Spotify</a>
         <md-button v-if="AUTHENTICATED" @click="LOGOUT()">Log Out</md-button>
       </div>
     </md-toolbar>
@@ -64,31 +77,37 @@ import { mapActions, mapGetters } from "vuex";
 export default {
   name: "Navbar",
 
-  methods: mapActions(["login","LOGOUT"]),
- 
-  computed: mapGetters(["AUTHENTICATED","AUTH_USER","USER_PROFILE"]),
+  methods: mapActions(["login", "LOGOUT", "LOGOUT_FROM_SPOTIFY"]),
 
-  created(){
+  computed: mapGetters([
+    "AUTHENTICATED",
+    "AUTH_USER",
+    "USER_PROFILE",
+    "AUTHENTICATED_WITH_SPOTIFY"
+  ]),
+  checkUserConnectionWithSpotify: {
+    get() {
+      return this.USER_PROFILE.connectedToSpotify;
+    }
+  },
+
+  created() {
     // if(this.$store.getters.AUTHENTICATED){
     //   const user = this.$store.getters.AUTH_USER;
     //   this.GET_FIRESTORE_USER_BY_EMAIL(this.AUTH_USER.email);
-      
-      
     // }
-    
   }
 };
 </script>
 
 <style scoped>
-  ul {
-    list-style-type: none;
-  }
-  a{
-    text-decoration: none;
-  }
-  .nav-item{
-    display: inline;
-  }
- 
+ul {
+  list-style-type: none;
+}
+a {
+  text-decoration: none;
+}
+.nav-item {
+  display: inline;
+}
 </style>

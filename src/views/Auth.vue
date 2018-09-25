@@ -5,26 +5,29 @@
 </template>
 
 <script>
-import { mapActions,mapGetters } from "vuex";
-import router from '../router';
-import {USER_BY_EMAIL_REQUEST} from "@/store/actions/user";
+import { mapActions, mapGetters } from "vuex";
+import router from "../router";
+//import { USER_BY_EMAIL_REQUEST } from "@/store/actions/user";
 
 export default {
   name: "Auth",
 
-  computed: mapGetters(['AUTH_USER']),
-  methods: mapActions(['HANDLE_AUTHENTICATION','HANDLE_AUTH','GET_USER_PROFILE_BY_EMAIL']),
+  computed: mapGetters(["AUTH_USER"]),
+  methods: mapActions([
+    "HANDLE_AUTHENTICATION",
+    "HANDLE_AUTH",
+    "GET_USER_PROFILE_BY_EMAIL"
+  ]),
 
-
-  data(){
-    return{
+  data() {
+    return {
       authError: " "
-    }
+    };
   },
-  created(){
+  created() {
     // this.HANDLE_AUTHENTICATION()
     //   .then(()=>{
-    //     console.log(this.AUTH_USER);  
+    //     console.log(this.AUTH_USER);
     //     router.push({
     //       name: "home"
     //   });
@@ -33,21 +36,18 @@ export default {
     //     this.authError = err;
     //   });
     this.HANDLE_AUTH()
-      .then((resp)=>{
+      .then(resp => {
         router.push({
           name: "home"
         });
-        
       })
-      .catch(err=>{
-        if(err.message.indexOf("10")>-1){
+      .catch(err => {
+        if (err.message.indexOf("10") > -1) {
           router.push({
             name: "user"
           });
         }
-        
       });
-
   }
 };
 </script>
