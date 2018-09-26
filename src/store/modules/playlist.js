@@ -94,15 +94,18 @@ const actions = {
         .then(resp => {
           commit("SET_PLAYLIST_STATUS", "Playlists from FIREBASE loaded");
           commit("SET_FIRESTORE_PLAYLISTS", resp);
-          dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST").
-            then(result => {
+          dispatch("GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST")
+            .then(result => {
               if(result.status===100){
-
+                dispatch("CHECK_SYNC_NEEDED_REQUEST");
+                resolve({
+                  status: 100,
+                  message: "All Firestore playlists and tracks loaded"
+                });
               }
-          });
-          resolve("OK");
+            })
+          .catch()
         })
-
         .catch(err => console.log(err));
     });
   },
