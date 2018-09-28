@@ -13,27 +13,30 @@ class FirebaseService {
    */
   async getTracksForPlaylist(playlistId) {
     let tracks = [];
+    try {
+      const trackQueryResponse = await db
+        .collection(`playlists/${playlistId}/tracks`)
+        .get();
 
-    const trackQueryResponse = await db
-      .collection(`playlists/${playlistId}/tracks`)
-      .get();
-
-    trackQueryResponse.docs.forEach(doc => {
-      let trackObj = {
-        id: doc.id,
-        spotifyTrackID: doc.data().spotifyTrackId,
-        spotifyAddedAt: doc.data().spotifyAddedAt,
-        name: doc.data().name,
-        album: doc.data().album,
-        artist: doc.data().artist,
-        tempo: doc.data().tempo,
-        key: doc.data().key,
-        timeSignature: doc.data().timeSignature,
-        duration: doc.data().duration
-      };
-      tracks.push(trackObj);
-    });
-    return tracks;
+      trackQueryResponse.docs.forEach(doc => {
+        let trackObj = {
+          id: doc.id,
+          spotifyTrackID: doc.data().spotifyTrackId,
+          spotifyAddedAt: doc.data().spotifyAddedAt,
+          name: doc.data().name,
+          album: doc.data().album,
+          artist: doc.data().artist,
+          tempo: doc.data().tempo,
+          key: doc.data().key,
+          timeSignature: doc.data().timeSignature,
+          duration: doc.data().duration
+        };
+        tracks.push(trackObj);
+      });
+      return tracks;
+    } catch (error) {
+      return error;
+    }
   }
   /**
    *
