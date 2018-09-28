@@ -67,14 +67,19 @@ class SpotifyService {
     });
   }
   async getPlaylistTracks(userId, playlistId, access_token) {
-    let { data } = await Axios.get(
-      spotifyConfig.playlistTracksEndpoint(userId, playlistId),
-      {
-        headers: spotifyConfig.spotifyHeaders(access_token)
+    try {
+      let { data } = await Axios.get(
+        spotifyConfig.playlistTracksEndpoint(userId, playlistId),
+        {
+          headers: spotifyConfig.spotifyHeaders(access_token)
+        }
+      );
+      if (data.items) {
+        return data;
       }
-    );
-    //console.log(data.items);
-    return data;
+    } catch (error) {
+      return error;
+    }
   }
   /**
    *
@@ -123,10 +128,12 @@ class SpotifyService {
   mergeAudioDetailsAndTracks(audio_features, tracksArray) {
     tracksArray.forEach(track => {
       const audio_obj = audio_features.find(af => {
-        return af !== undefined ? af.id === track.spotifyTrackID : null;
+        return af !== null && af !== undefined
+          ? af.id === track.spotifyTrackID
+          : null;
       });
 
-      if (audio_obj !== undefined) {
+      if (audio_obj !== null && audio_obj !== undefined) {
         track.tempo = audio_obj.tempo;
         track.key = audio_obj.key;
         track.timeSignature = audio_obj.time_signature;
