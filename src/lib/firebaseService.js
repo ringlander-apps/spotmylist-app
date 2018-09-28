@@ -1,5 +1,4 @@
 import db from "@/firebaseInit";
-import { ok } from "assert";
 
 class FirebaseService {
   constructor() {
@@ -34,7 +33,6 @@ class FirebaseService {
       };
       tracks.push(trackObj);
     });
-    console.log(tracks);
     return tracks;
   }
   /**
