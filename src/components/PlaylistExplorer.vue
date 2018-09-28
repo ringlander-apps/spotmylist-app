@@ -1,5 +1,12 @@
 <template>
   <div class="container">
+    <div class="source-container md-elevation-4" id="playlistContainer">
+      <div class="list-tree-container">
+        <h3>Playlists</h3>
+        <md-list v-if="PLAYLISTS"></md-list>
+        <div v-else>Tree listing should go here...</div>
+      </div>
+    </div>
     <div class="source-container md-elevation-4" id="firebaseContainer">
       <div class="list-tree-container">
         <h3>Local playlists</h3>
@@ -116,9 +123,12 @@ export default {
     },
     ...mapActions([
       "GET_FIRESTORE_PLAYLISTS_REQUEST",
+      "GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST",
       "GET_SPOTIFY_PLAYLISTS_REQUEST",
       "SELECT_FIRESTORE_PLAYLIST_REQUEST",
-      "SELECT_SPOTIFY_PLAYLIST_REQUEST"
+      "SELECT_SPOTIFY_PLAYLIST_REQUEST",
+      "GET_SPOTIFY_PLAYLISTS",
+      "GET_PLAYLISTS"
     ])
   },
   computed: mapGetters([
@@ -132,36 +142,62 @@ export default {
     "SPOTIFY_TOKEN_EXPIRES_AT",
     "SPOTIFY_PLAYLISTS",
     "SELECTED_FIRESTORE_PLAYLIST",
-    "SELECTED_SPOTIFY_PLAYLIST"
+    "SELECTED_SPOTIFY_PLAYLIST",
+    "SPOTIFY_PLAYLIST_STATUS",
+    "FIRESTORE_PLAYLIST_STATUS",
+    "PLAYLISTS"
   ]),
 
-  created() {
-    //this.getFirebasePlaylists();
+  async created() {
+    let playlistRequests = [];
+    let playlistPayload = {
+      spotifyUserId: null,
+      access_token: null,
+      firestoreUserId: null
+    };
+
     if (this.USER_PROFILE) {
-      console.log(this.USER_PROFILE.userId);
-      if (!this.FIRESTORE_PLAYLISTS) {
-        this.GET_FIRESTORE_PLAYLISTS_REQUEST(this.USER_PROFILE.userId).then(
-          res => console.log(res)
+      playlistPayload.firestoreUserId = this.USER_PROFILE.userId;
+      /* if (!this.FIRESTORE_PLAYLISTS) {
+        let response = null;
+        let response2 = await this.GET_FIRESTORE_PLAYLISTS_REQUEST(
+          this.USER_PROFILE.userId
         );
+        console.log(response2.status);
+        if (response2.status === 401) {
+          response = await this.GET_FIRESTORE_PLAYLISTS_TRACKS_REQUEST();
+          console.log(response);
+
+        }
+      } */
+      if (this.SPOTIFY_TOKEN_EXPIRES_AT / 1000 < Date.now() / 1000) {
+        console.log(`Spotify token has expired`);
+        //logout
+        //get refresh token
+      } else {
+        playlistPayload.spotifyUserId = this.USER_PROFILE.spotifySettings.spotifyUserId;
+        playlistPayload.access_token = this.SPOTIFY_ACCESS_TOKEN;
+
+        /* if (!this.SPOTIFY_PLAYLISTS && !this.FIRESTORE_PLAYLISTS) {
+          playlistRequests.push(
+            this.GET_SPOTIFY_PLAYLISTS({
+              id: this.USER_PROFILE.spotifySettings.spotifyUserId,
+              token: this.SPOTIFY_ACCESS_TOKEN
+            })
+          );
+          playlistRequests.push(
+            this.GET_FIRESTORE_PLAYLISTS_REQUEST(this.USER_PROFILE.userId)
+          );
+          let requestResult = await Promise.all(playlistRequests);
+          console.log(requestResult); */
+        /* let result = await this.GET_SPOTIFY_PLAYLISTS({
+            id: this.USER_PROFILE.spotifySettings.spotifyUserId,
+            token: this.SPOTIFY_ACCESS_TOKEN
+          }); */
+        //console.log(result.status);
+        //console.log(this.FIRESTORE_PLAYLIST_STATUS.status);
       }
-    }
-    if (this.SPOTIFY_TOKEN_EXPIRES_AT / 1000 < Date.now() / 1000) {
-      console.log(`Spotify token has expired`);
-      //logout
-      //get refresh token
-    } else {
-      if (!this.SPOTIFY_PLAYLISTS) {
-        console.log(this.USER_PROFILE);
-        console.log(this.SPOTIFY_ACCESS_TOKEN);
-        this.GET_SPOTIFY_PLAYLISTS_REQUEST({
-          id: this.USER_PROFILE.spotifySettings.spotifyUserId,
-          token: this.SPOTIFY_ACCESS_TOKEN
-        })
-          .then(res => {
-            console.log(res);
-          })
-          .catch(err => console.log(err));
-      }
+      let result = await this.GET_PLAYLISTS(playlistPayload);
     }
   }
 };
@@ -185,6 +221,6 @@ export default {
 }
 .table-cell {
   text-align: left;
-  padding:0px;
+  padding: 0px;
 }
 </style>
