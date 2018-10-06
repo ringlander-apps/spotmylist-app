@@ -1,7 +1,10 @@
 <template>
   <div id="app">
     <Navbar/>
-    <router-view/>
+    <transition name="fade" mode="out-in">
+      <router-view/>
+    </transition>
+    
     <!-- <v-app>
       <v-content>
         <v-container>Hello world</v-container>
@@ -11,13 +14,13 @@
 </template>
 
 <script>
-  import Navbar from '@/components/Navbar'
+import Navbar from "@/components/Navbar";
 
-  export default{
-    components:{
-      Navbar
-    }
+export default {
+  components: {
+    Navbar
   }
+};
 </script>
 <style>
 #app {
@@ -38,5 +41,14 @@
 
 #nav a.router-link-exact-active {
   color: #42b983;
+}
+.fade-enter-active {
+  transition-duration: 0.7s;
+  transition-timing-function: ease;
+  transition-property: opacity;
+}
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
 }
 </style>
